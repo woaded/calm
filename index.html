@@ -2,79 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Calmjak Waterfall</title>
+    <title>Calmjak Waterfall - Forced</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        /* The GIF Background */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: black; }
         .background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-image: url("https://media1.tenor.com/m/CN683UuuA48AAAAC/calmjak-waterfall.gif");
-            background-repeat: no-repeat;
-            background-size: cover;
-            background-position: center;
-            z-index: 1;
-        }
-
-        /* Initial Overlay Text */
-        #status {
-            position: relative;
-            z-index: 2;
-            color: white;
-            font-family: sans-serif;
-            font-size: 1.2rem;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
-            pointer-events: none;
+            background-size: cover; background-position: center; z-index: 1;
         }
     </style>
 </head>
 <body>
-
     <div class="background"></div>
-    <div id="status">click</div>
+    <audio id="zenAudio" src="audio.opus" loop></audio>
 
     <script>
-        // Replace with your actual audio file path
-        const AUDIO_SRC = 'audio.opus'; 
-        
-        function goZen() {
-            // 1. Play Audio
-            const audio = new Audio(AUDIO_SRC);
-            audio.loop = true;
-            audio.play().catch(err => console.log("Audio trigger failed:", err));
+        const audio = document.getElementById('zenAudio');
+        const doc = document.documentElement;
 
-            // 2. Trigger Fullscreen (F11 simulation)
-            const doc = document.documentElement;
-            if (doc.requestFullscreen) {
-                doc.requestFullscreen();
-            } else if (doc.webkitRequestFullscreen) {
-                doc.webkitRequestFullscreen();
-            } else if (doc.mozRequestFullScreen) {
-                doc.mozRequestFullScreen();
+        async function forceZen() {
+            // 1. Immediate Audio Execution
+            audio.muted = false; 
+            try {
+                await audio.play();
+            } catch (e) {
+                console.error("Audio failed: Your environment is still enforcing Autoplay Policy.");
             }
 
-            // Clean up UI
-            document.getElementById('status').style.display = 'none';
+            // 2. Immediate Fullscreen Execution
+            const requestFS = doc.requestFullscreen || doc.webkitRequestFullscreen || doc.mozRequestFullScreen || doc.msRequestFullscreen;
+            if (requestFS) {
+                requestFS.call(doc).catch(e => {
+                    console.error("Fullscreen failed: Browser requires a user gesture override.");
+                });
+            }
+
+            // Hide cursor immediately
             document.body.style.cursor = 'none';
         }
 
-        // Trigger on first click
-        window.addEventListener('click', goZen, { once: true });
+        // Execute as soon as the script loads and the window is ready
+        window.onload = forceZen;
+        forceZen(); 
     </script>
 </body>
 </html>
